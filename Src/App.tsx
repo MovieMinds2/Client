@@ -16,7 +16,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Main />}></Route>
           <Route path="/login" element={<Login />}></Route>
-          <Route path="/createAccount" element={<CreateAccoount />}></Route>
+          <Route path="/create-account" element={<CreateAccoount />}></Route>
           {/* 일치하는 라우트가 없는 경우 404 처리 */}
           <Route path="*" element={<NotFound />}></Route>
         </Routes>
