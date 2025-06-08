@@ -1,5 +1,7 @@
-import axios from "axios";
+// import axios from "axios";
 import React, { useState } from "react";
+import auth from "../../../firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 const CreateAccount = () => {
   const [nickName, setNickName] = useState("");
@@ -22,15 +24,29 @@ const CreateAccount = () => {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-    // API 호출 함수
-    await axios
-      .post("http://localhost:5000/users/sign-up", {
-        nickname: nickName,
-        email: email,
-        password: password,
+
+    // firebase 회원가입
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed up
+        const user = userCredential.user;
+
+        updateProfile(user, {
+          displayName: nickName,
+          // fake 프로필로 대체
+          photoURL: "https://example.com/jane-q-user/profile.jpg",
+        }).then(() => {
+          console.log(user);
+          setNickName("");
+          setEmail("");
+          setPassword("");
+        });
       })
-      .then((result) => {
-        console.log(result);
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, ":", errorMessage);
+        // ..
       });
   };
 
