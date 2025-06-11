@@ -4,7 +4,9 @@ const Main = () => {
   return (
     <>
       <div>Main Page</div>
-      <Link to="/createAccount">로그인</Link>
+      <Link to="/login">로그인</Link>
+      <br />
+      <Link to="/create-account">회원가입</Link>
     </>
   );
 };

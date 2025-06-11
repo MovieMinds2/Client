@@ -1,7 +1,10 @@
 const Header = () => {
   return (
     <>
-      <div>Header Page</div>
+      <div>
+        Header Page
+        <button>로그아웃</button>
+      </div>
     </>
   );
 };
