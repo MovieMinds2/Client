@@ -6,9 +6,10 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 // 타입 명시
-import type { User, OAuthCredential } from "firebase/auth";
+import type { User } from "firebase/auth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -16,6 +17,8 @@ const Login = () => {
   const [user, setUser] = useState<User | null>(null);
 
   const provider = new GoogleAuthProvider();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
@@ -31,23 +34,29 @@ const Login = () => {
     setPassword(event.target.value);
   };
 
-  const e_login = async (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.preventDefault();
-
-    // login
-    await signInWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
-        // Signed in
-        const userId = await api_login(userCredential.user.uid);
-        console.log(userId);
-      })
-      .catch((error) => {
+  // 로그인
+  const e_login = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      if (userCredential) {
+        const result = await api_login(userCredential.user.uid);
+        if (result.status == 200) {
+          console.log("sucess");
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error) {
         console.log(error.code, ":", error.message);
-      });
+      }
+    }
   };
 
+  // 소셜 로그인
   const e_socialLogin = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -85,7 +94,7 @@ const Login = () => {
       });
   };
 
-  const api_login = async (userId: string): Promise<any | undefined> => {
+  const api_login = async (userId: string): Promise<any> => {
     try {
       const result = await axios.post(
         "http://localhost:5000/users/login",
@@ -101,8 +110,8 @@ const Login = () => {
       if (result) {
         return result;
       }
-    } catch (error: any | undefined) {
-      throw new Error(error.message);
+    } catch (error) {
+      if (error instanceof Error) throw new Error(error.message);
     }
   };
 
@@ -110,13 +119,16 @@ const Login = () => {
     <>
       <div>Login Page</div>
 
-      <span>Email</span>
-      <input type="text" onChange={saveEmail} value={email}></input>
-      <br />
-      <span>Password</span>
-      <input type="password" onChange={savePassword} value={password}></input>
-      <br />
-      <button onClick={e_login}>로그인</button>
+      <form onSubmit={e_login}>
+        <span>Email</span>{" "}
+        <input type="text" onChange={saveEmail} value={email} />
+        <br />
+        <span>Password</span>
+        <input type="password" onChange={savePassword} value={password} />
+        <input type="submit" value={"로그인"} />
+        <br />
+      </form>
+
       <button onClick={e_socialLogin}>소셜 로그인</button>
     </>
   );
