@@ -1,5 +1,6 @@
+import React from 'react';
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -14,7 +15,6 @@ const Header = () => {
 
       try {
         const result = await axios.post("http://localhost:5000/users/logout", {
-          // 쿠키값 전송 여부
           withCredentials: true,
         });
 
@@ -23,19 +23,72 @@ const Header = () => {
           navigate("/");
         }
       } catch (error) {
-        // 타입 가드를 통해서 에러
         if (error instanceof Error) console.log(`error:${error.message}`);
       }
     }
   };
+
   return (
-    <>
-      <div>
-        Header Page
-        <button onClick={e_logout}>로그아웃</button>
+    <header style={headerStyle}>
+      <div style={logoContainerStyle}>
+        <Link to="/" style={logoLinkStyle}>
+          <span style={logoTextStyle}>MovieMinds</span>
+        </Link>
       </div>
-    </>
+
+      <nav style={navStyle}>
+        <Link to="/login" style={navLinkStyle}>로그인</Link>
+        <Link to="/create-account" style={navLinkStyle}>회원가입</Link>
+        <button onClick={e_logout} style={navButtonStyle}>로그아웃</button>
+      </nav>
+    </header>
   );
 };
 
 export default Header;
+
+const headerStyle: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '10px 20px',
+  backgroundColor: '#283593',
+  color: 'white',
+};
+
+const logoContainerStyle: React.CSSProperties = {};
+
+const logoLinkStyle: React.CSSProperties = {
+  textDecoration: 'none',
+  color: 'white',
+  fontSize: '1.8em',
+  fontWeight: 'bold',
+};
+
+const logoTextStyle: React.CSSProperties = {};
+
+const navStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: '20px',
+  alignItems: 'center',
+};
+
+const navLinkStyle: React.CSSProperties = {
+  textDecoration: 'none',
+  color: 'white',
+  fontSize: '1.1em',
+  padding: '5px 10px',
+  borderRadius: '5px',
+  transition: 'background-color 0.3s ease',
+};
+
+const navButtonStyle: React.CSSProperties = {
+  backgroundColor: 'white',
+  color: 'black',
+  border: '1px solid black',
+  padding: '8px 15px',
+  borderRadius: '5px',
+  cursor: 'pointer',
+  fontSize: '1.1em',
+  transition: 'background-color 0.3s ease',
+};
