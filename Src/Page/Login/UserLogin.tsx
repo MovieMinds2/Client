@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import auth from "../../../firebase";
 import {
   GoogleAuthProvider,
@@ -8,23 +8,13 @@ import {
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
-// 타입 명시
-import type { User } from "firebase/auth";
-
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState<User | null>(null);
 
   const provider = new GoogleAuthProvider();
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) {
-      console.log(user.uid);
-    }
-  }, [user]);
 
   const saveEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
@@ -47,11 +37,19 @@ const Login = () => {
         const result = await api_login(userCredential.user.uid);
         if (result.status == 200) {
           console.log("sucess");
+          navigate("/"); // 로그인 성공시 메인으로 이동
         }
       }
-    } catch (error) {
-      if (error instanceof Error) {
+    } catch (error: unknown) { 
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        "message" in error
+      ) {
         console.log(error.code, ":", error.message);
+      } else {
+        console.log("An unknown error occurred", error);
       }
     }
   };
@@ -77,7 +75,13 @@ const Login = () => {
         console.log(user.uid);
         const response = await api_login(user.uid);
 
-        console.log(response);
+        // 소셜 로그인 성공 시 페이지 이동
+        
+        if (response && response.status === 200) {
+          navigate("/");
+        } else {
+          console.log(response);
+        }
         // IdP data available using getAdditionalUserInfo(result)
         // ...
       })
