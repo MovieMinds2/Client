@@ -28,16 +28,23 @@ const Header = () => {
 
     if (confirm("로그아웃 하시겠습니까?")) {
       try {
-        await axios.post("http://localhost:5000/users/logout", {
-          withCredentials: true,
-        });
+        const result = await axios.post(
+          "http://localhost:5000/users/logout",
+          null,
+          {
+            withCredentials: true,
+          }
+        );
+        if (result.status === 200) {
+          console.log(result.status);
+          await signOut(auth);
+          alert("로그아웃 되었습니다.");
+          navigate("/");
+        }
       } catch (error) {
         console.error("백엔드 로그아웃 요청에 실패했습니다:", error);
+        return;
       }
-
-      await signOut(auth);
-      alert("로그아웃 되었습니다.");
-      navigate("/");
     }
   };
 

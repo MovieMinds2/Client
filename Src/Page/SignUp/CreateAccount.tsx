@@ -8,7 +8,8 @@ import { REGEX } from "./regex";
 import { useRef } from "react";
 import { FormHelperText, TextField } from "@mui/material";
 import { collection, addDoc } from "firebase/firestore";
-import { checkNickName } from "../../Feature/API/Firebase/User";
+import { api_login, checkNickName } from "../../Feature/API/User";
+import { useNavigate } from "react-router-dom";
 
 interface FormValue {
   nickname: string;
@@ -18,6 +19,8 @@ interface FormValue {
 }
 
 const CreateAccount = () => {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -57,6 +60,10 @@ const CreateAccount = () => {
             const docRef = await addDoc(collection(db, "users"), {
               nickname: user.displayName,
             });
+            if (docRef) {
+              const result = await api_login(user.uid);
+              if (result.status === 200) navigate("/");
+            }
             console.log("Document written with ID: ", docRef.id);
           } catch (e) {
             console.error("Error adding document: ", e);
