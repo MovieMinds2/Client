@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
+import { api_login } from "../../Feature/API/User";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -42,14 +43,16 @@ const Login = () => {
           navigate("/"); // 로그인 성공시 메인으로 이동
         }
       }
-    } catch (error: unknown) {
+    } catch (error) {
       if (
         error &&
         typeof error === "object" &&
         "code" in error &&
         "message" in error
       ) {
-        console.log(error.code, ":", error.message);
+        if (error.code === "auth/invalid-credential") {
+          alert("아이디 또는 비밀번호가 유효하지 않습니다.");
+        }
       } else {
         console.log("An unknown error occurred", error);
       }
@@ -111,29 +114,6 @@ const Login = () => {
         console.log(`${errorCode}: ${errorMessage}, ${email},${credential}`);
         // ...
       });
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const api_login = async (userId: string): Promise<any> => {
-    try {
-      const result = await axios.post(
-        "http://localhost:5000/users/login",
-        {
-          userId: userId,
-        },
-        {
-          // 쿠키값 전송 여부
-          withCredentials: true,
-        }
-      );
-
-      if (result) {
-        console.log(result);
-        return result;
-      }
-    } catch (error) {
-      if (error instanceof Error) throw new Error(error.message);
-    }
   };
 
   return (
