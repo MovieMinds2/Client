@@ -1,12 +1,14 @@
 import axios from "axios";
 import React, { useState } from "react";
-import auth from "../../../firebase";
+import { auth } from "../../../firebase";
 import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { v4 } from "uuid";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -40,7 +42,7 @@ const Login = () => {
           navigate("/"); // 로그인 성공시 메인으로 이동
         }
       }
-    } catch (error: unknown) { 
+    } catch (error: unknown) {
       if (
         error &&
         typeof error === "object" &&
@@ -72,11 +74,24 @@ const Login = () => {
 
         // The signed-in user info.
         const user = result.user;
+
+        const regex = /\(#([a-fA-F0-9]{12})\)/;
+        if (user.displayName) {
+          if (!regex.test(user.displayName)) {
+            // 닉네임 중복 처리
+            const uuid = v4().split("-");
+            await updateProfile(user, {
+              displayName: user.displayName.concat(`(#${uuid[4]})`),
+            });
+          }
+        }
+
         console.log(user.uid);
+        console.log(user.displayName);
         const response = await api_login(user.uid);
 
         // 소셜 로그인 성공 시 페이지 이동
-        
+
         if (response && response.status === 200) {
           navigate("/");
         } else {
@@ -98,6 +113,7 @@ const Login = () => {
       });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const api_login = async (userId: string): Promise<any> => {
     try {
       const result = await axios.post(
@@ -112,6 +128,7 @@ const Login = () => {
       );
 
       if (result) {
+        console.log(result);
         return result;
       }
     } catch (error) {
