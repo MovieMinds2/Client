@@ -1,27 +1,31 @@
-// import { useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+//import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+import { AuthProvider } from "./Context/AuthContext"; 
+
 import Header from "./Page/shared_component/Header";
-
-import Main from "./Page/Home/Home";
+import Home from "./Page/Home/Home";
 import Login from "./Page/Login/UserLogin";
-import CreateAccoount from "./Page/SignUp/CreateAccount";
-
+import CreateAccount from "./Page/SignUp/CreateAccount";
+import MovieDetail from './Page/Movie/MovieDetail';
 import NotFound from "./Page/shared_component/NotFound";
 
 function App() {
   return (
-    <>
+    <AuthProvider>
       <BrowserRouter>
         <Header />
         <Routes>
-          <Route path="/" element={<Main />}></Route>
-          <Route path="/login" element={<Login />}></Route>
-          <Route path="/create-account" element={<CreateAccoount />}></Route>
-          {/* 일치하는 라우트가 없는 경우 404 처리 */}
-          <Route path="*" element={<NotFound />}></Route>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/create-account" element={<CreateAccount />} />
+
+          <Route path="/movie/:movieId" element={<MovieDetail />} />
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-    </>
+    </AuthProvider>
   );
 }
 
