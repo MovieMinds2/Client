@@ -3,7 +3,11 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../Context/AuthContext";
 import "./MovieDetail.css";
-import { api_insertReview, api_reviewInsert } from "../../Feature/API/Review";
+import {
+  api_getReview,
+  api_insertReview,
+  type IReviewResult,
+} from "../../Feature/API/Review";
 
 interface MovieDetailData {
   id: number;
@@ -38,8 +42,7 @@ const MovieDetail: React.FC = () => {
   const [movie, setMovie] = useState<MovieDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<IReviewResult[]>([]);
 
   const [score, setScore] = useState(5);
   const [content, setContent] = useState("");
@@ -68,22 +71,21 @@ const MovieDetail: React.FC = () => {
     fetchMovieDetail();
   }, [movieId]);
 
-  useEffect(() => {}, []);
-
   useEffect(() => {
-    if (!movieId) return;
-    const savedReviews = localStorage.getItem(`reviews_${movieId}`);
-    if (savedReviews) {
-      setReviews(JSON.parse(savedReviews));
-    } else {
-      setReviews([]);
-    }
-  }, [movieId]);
+    // useEffect에 직접적으로 async/ await를 사용할 수 없음
+    const fetchReviewData = async () => {
+      if (movie) {
+        // 영화 정보를 갖고 오면 리뷰 조회
+        const results = await api_getReview(movie.id);
+        if (results) {
+          setReviews(results);
+          setContent("");
+        }
+      }
+    };
 
-  useEffect(() => {
-    if (!movieId) return;
-    localStorage.setItem(`reviews_${movieId}`, JSON.stringify(reviews));
-  }, [reviews, movieId]);
+    fetchReviewData();
+  }, [movie]);
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,14 +98,6 @@ const MovieDetail: React.FC = () => {
       return;
     }
     if (!movie) return;
-
-    // const newReview: Review = {
-    //   id: Date.now(),
-    //   authorId: currentUser.userId,
-    //   authorName: currentUser.displayName || currentUser.userId,
-    //   score,
-    //   content,
-    // };
 
     const newReview: IReview = {
       movieId: movie.id,
@@ -119,24 +113,15 @@ const MovieDetail: React.FC = () => {
 
     if (result.status == 200) {
       alert("리뷰가 등록되었습니다.");
+      const results = await api_getReview(movie.id);
+      if (results) {
+        setReviews(results);
+      }
     }
-
-    // setReviews([newReview, ...reviews]);
-
-    // setScore(5);
-    // setContent("");
   };
 
-  const handleReviewDelete = (reviewToDelete: Review) => {
-    if (currentUser?.userId !== reviewToDelete.authorId) {
-      alert("본인이 작성한 리뷰만 삭제할 수 있습니다.");
-      return;
-    }
-
-    if (window.confirm("정말 이 리뷰를 삭제하시겠습니까?")) {
-      setReviews(reviews.filter((r) => r.id !== reviewToDelete.id));
-      alert("리뷰가 삭제되었습니다.");
-    }
+  const handleReviewDelete = (userId: string) => {
+    console.log(movie?.id, ",", userId);
   };
 
   if (loading)
@@ -206,15 +191,15 @@ const MovieDetail: React.FC = () => {
         <div className="review-list">
           {reviews.length > 0 ? (
             reviews.map((review) => (
-              <div key={review.id} className="review-item">
+              <div key={review.userId} className="review-item">
                 <div className="review-header">
-                  <strong>{review.authorName}</strong>
-                  <span>{"⭐️".repeat(review.score)}</span>
+                  <strong>{review.nickname}</strong>
+                  <span>{"⭐️".repeat(review.rankScore)}</span>
                 </div>
                 <p>{review.content}</p>
-                {currentUser?.userId === review.authorId && (
+                {currentUser?.userId === review.userId && (
                   <button
-                    onClick={() => handleReviewDelete(review)}
+                    onClick={() => handleReviewDelete(review.userId)}
                     className="delete-button"
                   >
                     삭제
