@@ -70,6 +70,12 @@ const Header: React.FC = () => {
             <button onClick={handleLogout} style={navButtonStyle}>
               로그아웃
             </button>
+
+            {user?.photoURL ? (
+              <img src={`${user?.photoURL}`} width={50} height={50} />
+            ) : null}
+            {user?.displayName ? <span> {user.displayName} </span> : null}
+
           </>
         ) : (
           <>
