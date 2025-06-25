@@ -1,65 +1,73 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { auth } from "../../../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import axios from "axios";
 
-const Header = () => {
+const Header: React.FC = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const user = auth.currentUser;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-      }
+      setIsLoggedIn(!!user);
     });
-
     return () => unsubscribe();
   }, []);
 
-  const e_logout = async (
+  const handleLogout = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault();
-
-    if (confirm("로그아웃 하시겠습니까?")) {
+    if (window.confirm("로그아웃 하시겠습니까?")) {
       try {
-        const result = await axios.post(
+        await axios.post(
           "http://localhost:5000/users/logout",
           null,
-          {
-            withCredentials: true,
-          }
+          { withCredentials: true }
         );
-        if (result.status === 200) {
-          console.log(result.status);
-          await signOut(auth);
-          alert("로그아웃 되었습니다.");
-          navigate("/");
-        }
+        await signOut(auth);
+        alert("로그아웃 되었습니다.");
+        navigate("/");
       } catch (error) {
-        console.error("백엔드 로그아웃 요청에 실패했습니다:", error);
-        return;
+        console.error("Failed to request logout:", error);
       }
     }
   };
 
   return (
     <header style={headerStyle}>
-      <div>
+      {/* --- 1. Left Section: Logo + Search --- */}
+      <div style={leftSectionStyle}>
         <Link to="/" style={logoLinkStyle}>
           <span>MovieMinds</span>
         </Link>
+        <Link to="/search" style={navLinkStyle}>
+          검색
+        </Link>
       </div>
 
-      <nav style={navStyle}>
+      {/* --- 2. Center Section: Home + Community --- */}
+      <nav style={centerNavStyle}>
+        <Link to="/" style={navLinkStyle}>
+          홈
+        </Link>
+        <Link to="/community" style={navLinkStyle}>
+          커뮤니티
+        </Link>
+      </nav>
+
+      {/* --- 3. Right Section: User Menu --- */}
+      <div style={rightSectionStyle}>
         {isLoggedIn ? (
           <>
-            <button onClick={e_logout} style={navButtonStyle}>
+            {/* Display an empty string if displayName is null or undefined to prevent errors */}
+            <span>{user?.displayName || user?.email || '사용자'}님</span>
+            <Link to="/mypage" style={navLinkStyle}>
+              마이페이지
+            </Link>
+            <button onClick={handleLogout} style={navButtonStyle}>
               로그아웃
             </button>
 
@@ -67,6 +75,7 @@ const Header = () => {
               <img src={`${user?.photoURL}`} width={50} height={50} />
             ) : null}
             {user?.displayName ? <span> {user.displayName} </span> : null}
+
           </>
         ) : (
           <>
@@ -78,7 +87,7 @@ const Header = () => {
             </Link>
           </>
         )}
-      </nav>
+      </div>
     </header>
   );
 };
@@ -86,43 +95,56 @@ const Header = () => {
 export default Header;
 
 const headerStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: "10px 20px",
-  backgroundColor: "#283593",
-  color: "white",
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '15px 30px',
+  backgroundColor: '#20232a',
+  color: 'white',
+  borderBottom: '1px solid #444'
 };
 
+const leftSectionStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '20px',
+};
+  
 const logoLinkStyle: React.CSSProperties = {
-  textDecoration: "none",
-  color: "white",
-  fontSize: "1.8em",
-  fontWeight: "bold",
+  textDecoration: 'none',
+  color: '#61dafb',
+  fontSize: '1.8rem',
+  fontWeight: 'bold',
 };
 
-const navStyle: React.CSSProperties = {
-  display: "flex",
-  gap: "20px",
-  alignItems: "center",
+const centerNavStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: '30px',
 };
 
+const rightSectionStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '15px',
+};
+  
 const navLinkStyle: React.CSSProperties = {
-  textDecoration: "none",
-  color: "white",
-  fontSize: "1.1em",
-  padding: "5px 10px",
-  borderRadius: "5px",
-  transition: "background-color 0.3s ease",
+  textDecoration: 'none',
+  color: '#e0e0e0',
+  fontSize: '1.1rem',
+  padding: '8px 12px',
+  borderRadius: '5px',
+  transition: 'background-color 0.2s ease, color 0.2s ease',
 };
-
+  
 const navButtonStyle: React.CSSProperties = {
-  backgroundColor: "white",
-  color: "black",
-  border: "1px solid black",
-  padding: "8px 15px",
-  borderRadius: "5px",
-  cursor: "pointer",
-  fontSize: "1.1em",
-  transition: "background-color 0.3s ease",
+  backgroundColor: '#61dafb',
+  color: '#20232a',
+  border: 'none',
+  padding: '8px 15px',
+  borderRadius: '5px',
+  cursor: 'pointer',
+  fontSize: '1.1rem',
+  fontWeight: 'bold',
+  transition: 'background-color 0.2s ease',
 };

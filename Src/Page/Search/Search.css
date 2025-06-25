@@ -1,0 +1,86 @@
+.search-page-container {
+    max-width: 1400px; 
+    margin: 20px auto;
+    padding: 20px;
+  }
+  
+  .search-page-container h2 {
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
+    font-size: 1.8rem;
+  }
+  
+  .search-results-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 25px; /* 아이템 간 간격 */
+    margin-top: 30px;
+  }
+  
+  .result-card {
+    text-decoration: none;
+    color: inherit;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-in-out;
+    background-color: #f9f9f9;
+  }
+  
+  .result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+  
+  .result-card img {
+    width: 100%;
+    height: 400px; /* 포스터 이미지 높이 */
+    object-fit: cover;
+    background-color: #e0e0e0; /* 이미지가 없을 때 배경색 */
+  }
+  
+  .result-card .result-info {
+    padding: 15px;
+    text-align: center;
+  }
+  
+  .result-card h3 {
+    margin: 0;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* 제목이 길면 ...으로 표시 */
+  }
+  
+  .status-message {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 1.2rem;
+    color: #888;
+  }
+  
+  .status-message.error {
+    color: red;
+  }
+  
+  .load-more-container {
+    text-align: center;
+    margin-top: 40px;
+  }
+  
+  .load-more-button {
+    padding: 12px 40px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: 2px solid #333;
+    background-color: white;
+    color: #333;
+    border-radius: 30px;
+    transition: all 0.3s;
+  }
+  
+  .load-more-button:hover {
+    background-color: #333;
+    color: white;
+  }
