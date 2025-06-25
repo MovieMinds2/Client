@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap');
 
+main { 
+  padding-top: 50px; /* 헤더-페이지 사이 간격값 */
+}
+
+main.is-home {
+  padding-top: 0;
+}
+
+html {
+  scroll-padding-top: 81px;
+}
+
 body {
   font-family: 'Nanum Gothic', sans-serif;
   margin: 0;

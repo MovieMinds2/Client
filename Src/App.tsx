@@ -1,5 +1,4 @@
-//import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from "./Context/AuthContext"; 
 
 import Header from "./Page/shared_component/Header";
@@ -10,11 +9,15 @@ import MovieDetail from './Page/Movie/MovieDetail';
 import Search from './Page/Search/Search'; 
 import NotFound from "./Page/shared_component/NotFound";
 
-function App() {
+const AppLayout = () => {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+  const mainClassName = isHomePage ? 'is-home' : '';
+
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Header />
+    <>
+      <Header />
+      <main className={mainClassName}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -23,6 +26,16 @@ function App() {
           <Route path="/search" element={<Search />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+      </main>
+    </>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppLayout />
       </BrowserRouter>
     </AuthProvider>
   );
