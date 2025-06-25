@@ -10,19 +10,17 @@ interface Movie {
 }
 
 const Search: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('query');
-
-  const [results, setResults] = useState<Movie[]>([]); // 영화 결과 목록
-  const [page, setPage] = useState(1); // 현재 페이지 번호
-  const [totalResults, setTotalResults] = useState(0); // 전체 결과 개수
-  const [hasMore, setHasMore] = useState(false); // 더 불러올 페이지가 있는지
-  const [loading, setLoading] = useState(false); // 로딩 상태
+  const [inputValue, setInputValue] = useState('');
+  const [results, setResults] = useState<Movie[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSearchResults = useCallback(async (currentPage: number) => {
-    if (!query) return;
-
+  const fetchSearchResults = useCallback(async (currentQuery: string, currentPage: number) => {
     setLoading(true);
     setError(null);
     try {
@@ -31,21 +29,18 @@ const Search: React.FC = () => {
         params: {
           api_key: API_KEY,
           language: 'ko-KR',
-          query: query,
+          query: currentQuery,
           page: currentPage,
         },
       });
 
-      // '더보기'일 경우, 기존 결과에 새 결과를 추가
       if (currentPage > 1) {
         setResults(prev => [...prev, ...response.data.results]);
       } else {
-        // 첫 페이지일 경우, 결과 목록을 새로 설정
         setResults(response.data.results);
       }
       
       setTotalResults(response.data.total_results);
-      // 현재 페이지 < 전체 페이지 일 때 '더보기' 버튼 표시
       setHasMore(response.data.page < response.data.total_pages);
 
     } catch (err) {
@@ -54,24 +49,55 @@ const Search: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    // URL의 검색어가 바뀔 때, 검색창의 입력값도 동기화
+    setInputValue(query || '');
   }, [query]);
 
-  // 검색어가 바뀔 때마다 첫 페이지 로딩
   useEffect(() => {
-    setPage(1); 
-    fetchSearchResults(1);
-  }, [fetchSearchResults]);
+    // URL에 검색어가 있을 때만 API 호출 실행
+    if (query) {
+      setPage(1);
+      setResults([]);
+      fetchSearchResults(query, 1);
+    } else {
+      // URL에 검색어가 없으면(예: /search 페이지 첫 방문) 결과 초기화
+      setResults([]);
+      setTotalResults(0);
+    }
+  }, [query, fetchSearchResults]);
 
-  // '더보기' 버튼 클릭 핸들러
   const handleLoadMore = () => {
-    const nextPage = page + 1;
-    setPage(nextPage);
-    fetchSearchResults(nextPage);
+    if (query) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchSearchResults(query, nextPage);
+    }
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputValue.trim()) {
+      // URL의 query 파라미터를 현재 입력된 값으로 변경
+      setSearchParams({ query: inputValue });
+    }
   };
 
   return (
     <div className="search-page-container">
-      {query && (
+      <form onSubmit={handleSearchSubmit} className="search-form-on-page">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="찾고 싶은 영화를 검색하세요."
+        />
+        <button type="submit">검색</button>
+      </form>
+
+      {query && !loading && (
         <h2>
           "{query}"에 대한 {totalResults}개의 검색 결과
         </h2>
@@ -91,11 +117,11 @@ const Search: React.FC = () => {
         ))}
       </div>
       
-      {loading && <p className="status-message">불러오는 중...</p>}
+      {loading && <p className="status-message">결과를 불러오는 중...</p>}
       {error && <p className="status-message error">{error}</p>}
       
       {!loading && results.length === 0 && query && (
-        <p className="status-message">검색 결과가 없습니다.</p>
+        <p className="status-message">"{query}"에 대한 검색 결과가 없습니다.</p>
       )}
 
       {!loading && hasMore && (
