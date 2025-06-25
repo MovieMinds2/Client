@@ -84,3 +84,32 @@
     background-color: #333;
     color: white;
   }
+  
+  .search-form-on-page {
+  display: flex;
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+.search-form-on-page input {
+  flex-grow: 1; /* 입력창이 남은 공간을 모두 차지하도록 */
+  padding: 15px 20px;
+  font-size: 1.2rem;
+  border: 2px solid #ddd;
+  border-radius: 8px 0 0 8px;
+  outline: none;
+}
+.search-form-on-page input:focus {
+  border-color: #333;
+}
+
+.search-form-on-page button {
+  padding: 0 30px;
+  font-size: 1.2rem;
+  border: 2px solid #333;
+  border-left: none;
+  background-color: #333;
+  color: white;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+}
