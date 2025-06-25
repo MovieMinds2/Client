@@ -64,7 +64,7 @@ const Header = () => {
             </button>
 
             {user?.photoURL ? (
-              <img src={`${user?.photoURL}`} width={30} height={30} />
+              <img src={`${user?.photoURL}`} width={50} height={50} />
             ) : null}
             {user?.displayName ? <span> {user.displayName} </span> : null}
           </>

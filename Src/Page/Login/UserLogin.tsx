@@ -91,6 +91,7 @@ const Login = () => {
 
         console.log(user.uid);
         console.log(user.displayName);
+        console.log(user.photoURL);
         const response = await api_login(user.uid);
 
         // 소셜 로그인 성공 시 페이지 이동
