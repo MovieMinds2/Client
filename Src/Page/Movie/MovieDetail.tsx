@@ -18,14 +18,6 @@ interface MovieDetailData {
   vote_average: number;
 }
 
-interface Review {
-  id: number;
-  authorId: string;
-  authorName: string;
-  score: number;
-  content: string;
-}
-
 export interface IReview {
   movieId: number;
   movieTitle: string;

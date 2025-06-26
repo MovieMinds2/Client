@@ -12,7 +12,7 @@ export const api_insertReview = async (newReview: IReview): Promise<any> => {
   try {
     console.log(newReview);
     const result = await axios.post(
-      "http://localhost:5000/reviews",
+      `http://${import.meta.env.VITE_SERVER_IP}/reviews"`,
       {
         newReview: newReview,
       },
@@ -37,10 +37,13 @@ export const api_getReview = async (
   console.log("리뷰 조회");
 
   try {
-    const result = await axios.get(`http://localhost:5000/reviews/${movieId}`, {
-      // 쿠키값 전송 여부
-      withCredentials: true,
-    });
+    const result = await axios.get(
+      `http://${import.meta.env.VITE_SERVER_IP}/reviews/${movieId}`,
+      {
+        // 쿠키값 전송 여부
+        withCredentials: true,
+      }
+    );
 
     if (result) {
       console.log("결과:", result.data);

@@ -23,7 +23,7 @@ export const checkNickName = async (nickname: string): Promise<boolean> => {
 export const api_login = async (userId: string): Promise<any> => {
   try {
     const result = await axios.post(
-      "http://localhost:5000/users/login",
+      `http://${import.meta.env.VITE_SERVER_IP}/users/login`,
       {
         userId: userId,
       },
