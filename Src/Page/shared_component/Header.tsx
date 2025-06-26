@@ -22,11 +22,9 @@ const Header: React.FC = () => {
     event.preventDefault();
     if (window.confirm("로그아웃 하시겠습니까?")) {
       try {
-        await axios.post(
-          "http://localhost:5000/users/logout",
-          null,
-          { withCredentials: true }
-        );
+        await axios.post("http://3.38.240.188:5000/users/logout", null, {
+          withCredentials: true,
+        });
         await signOut(auth);
         alert("로그아웃 되었습니다.");
         navigate("/");
@@ -63,7 +61,7 @@ const Header: React.FC = () => {
         {isLoggedIn ? (
           <>
             {/* Display an empty string if displayName is null or undefined to prevent errors */}
-            <span>{user?.displayName || user?.email || '사용자'}님</span>
+            <span>{user?.displayName || user?.email || "사용자"}님</span>
             <Link to="/mypage" style={navLinkStyle}>
               마이페이지
             </Link>
@@ -75,7 +73,6 @@ const Header: React.FC = () => {
               <img src={`${user?.photoURL}`} width={50} height={50} />
             ) : null}
             {user?.displayName ? <span> {user.displayName} </span> : null}
-
           </>
         ) : (
           <>
@@ -95,56 +92,56 @@ const Header: React.FC = () => {
 export default Header;
 
 const headerStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '15px 30px',
-  backgroundColor: '#20232a',
-  color: 'white',
-  borderBottom: '1px solid #444'
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "15px 30px",
+  backgroundColor: "#20232a",
+  color: "white",
+  borderBottom: "1px solid #444",
 };
 
 const leftSectionStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '20px',
+  display: "flex",
+  alignItems: "center",
+  gap: "20px",
 };
-  
+
 const logoLinkStyle: React.CSSProperties = {
-  textDecoration: 'none',
-  color: '#61dafb',
-  fontSize: '1.8rem',
-  fontWeight: 'bold',
+  textDecoration: "none",
+  color: "#61dafb",
+  fontSize: "1.8rem",
+  fontWeight: "bold",
 };
 
 const centerNavStyle: React.CSSProperties = {
-  display: 'flex',
-  gap: '30px',
+  display: "flex",
+  gap: "30px",
 };
 
 const rightSectionStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '15px',
+  display: "flex",
+  alignItems: "center",
+  gap: "15px",
 };
-  
+
 const navLinkStyle: React.CSSProperties = {
-  textDecoration: 'none',
-  color: '#e0e0e0',
-  fontSize: '1.1rem',
-  padding: '8px 12px',
-  borderRadius: '5px',
-  transition: 'background-color 0.2s ease, color 0.2s ease',
+  textDecoration: "none",
+  color: "#e0e0e0",
+  fontSize: "1.1rem",
+  padding: "8px 12px",
+  borderRadius: "5px",
+  transition: "background-color 0.2s ease, color 0.2s ease",
 };
-  
+
 const navButtonStyle: React.CSSProperties = {
-  backgroundColor: '#61dafb',
-  color: '#20232a',
-  border: 'none',
-  padding: '8px 15px',
-  borderRadius: '5px',
-  cursor: 'pointer',
-  fontSize: '1.1rem',
-  fontWeight: 'bold',
-  transition: 'background-color 0.2s ease',
+  backgroundColor: "#61dafb",
+  color: "#20232a",
+  border: "none",
+  padding: "8px 15px",
+  borderRadius: "5px",
+  cursor: "pointer",
+  fontSize: "1.1rem",
+  fontWeight: "bold",
+  transition: "background-color 0.2s ease",
 };

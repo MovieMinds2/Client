@@ -36,6 +36,7 @@ const Login = () => {
         password
       );
       if (userCredential) {
+        console.log("쿠키값 가져오기");
         const result = await api_login(userCredential.user.uid);
         if (result.status == 200) {
           console.log("sucess");
