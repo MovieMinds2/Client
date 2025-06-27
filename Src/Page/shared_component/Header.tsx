@@ -22,9 +22,13 @@ const Header: React.FC = () => {
     event.preventDefault();
     if (window.confirm("로그아웃 하시겠습니까?")) {
       try {
-        await axios.post("http://3.38.240.188:5000/users/logout", null, {
-          withCredentials: true,
-        });
+        await axios.post(
+          `http://${import.meta.env.VITE_SERVER_IP}/users/logout`,
+          null,
+          {
+            withCredentials: true,
+          }
+        );
         await signOut(auth);
         alert("로그아웃 되었습니다.");
         navigate("/");
@@ -68,7 +72,6 @@ const Header: React.FC = () => {
             <button onClick={handleLogout} style={navButtonStyle}>
               로그아웃
             </button>
-
             {user?.photoURL ? (
               <img src={`${user?.photoURL}`} width={50} height={50} />
             ) : null}
