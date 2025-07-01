@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../Context/AuthContext";
 import "./MovieDetail.css";
 import {
-  api_deleteLikes,
+  api_insertReview,
   api_getReview,
   api_insertlikes,
-  api_insertReview,
+  api_deleteLikes,
   type IReviews,
 } from "../../Feature/API/Review";
 
@@ -20,7 +20,7 @@ interface MovieDetailData {
   vote_average: number;
 }
 
-export interface IReview {
+interface NewReview {
   movieId: number;
   movieTitle: string;
   userId: string;
@@ -33,14 +33,24 @@ const MovieDetail: React.FC = () => {
   const { movieId } = useParams<{ movieId: string }>();
   const { currentUser } = useAuth();
 
-  const [averRank, setAverRank] = useState<number>(0);
   const [movie, setMovie] = useState<MovieDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reviews, setReviews] = useState<IReviews[]>([]);
+  const [averRank, setAverRank] = useState<number>(0);
 
   const [score, setScore] = useState(5);
   const [content, setContent] = useState("");
+
+  const fetchReviewData = useCallback(async () => {
+    if (movieId && currentUser) {
+      const results = await api_getReview(parseInt(movieId), currentUser.userId);
+      if (results) {
+        setReviews(results.reviews);
+        setAverRank(parseFloat(results.averRank as any) || 0);
+      }
+    }
+  }, [movieId, currentUser]);
 
   useEffect(() => {
     if (!movieId) return;
@@ -64,120 +74,85 @@ const MovieDetail: React.FC = () => {
       }
     };
     fetchMovieDetail();
-  }, [movieId]);
-
-  useEffect(() => {
-    // useEffect에 직접적으로 async/ await를 사용할 수 없음
-    const fetchReviewData = async () => {
-      if (movie && currentUser) {
-        // 영화 정보를 갖고 오면 리뷰 조회
-        const results = await api_getReview(movie.id, currentUser?.userId);
-        if (results) {
-          setReviews(results.reviews);
-          setAverRank(results.averRank);
-        }
-      }
-    };
-
     fetchReviewData();
-  }, [movie]);
+  }, [movieId, fetchReviewData]);
+
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentUser) {
-      alert("리뷰를 작성하려면 로그인이 필요합니다.");
+    if (!currentUser || !movie) {
+      alert("로그인 정보와 영화 정보를 확인해주세요.");
       return;
     }
     if (!content) {
       alert("리뷰 내용을 모두 입력해주세요.");
       return;
     }
-    if (!movie) return;
 
-    const newReview: IReview = {
+    const newReview: NewReview = {
       movieId: movie.id,
       movieTitle: movie.title,
       userId: currentUser.userId,
-      nickname: currentUser.displayName ? currentUser.displayName : "anonymous",
+      nickname: currentUser.displayName || "anonymous",
       rankScore: score,
       content: content,
     };
 
-    //api 호출
-    const result = await api_insertReview(newReview);
-
-    if (result && result.status == 200) {
-      alert("리뷰가 등록되었습니다.");
-      const results = await api_getReview(movie.id, currentUser?.userId);
-      if (results) {
-        setAverRank(results.averRank);
-        setReviews(results.reviews);
+    try {
+      const result = await api_insertReview(newReview);
+      if (result && result.status === 200) {
+        alert("리뷰가 등록되었습니다.");
+        fetchReviewData(); // 리뷰 목록 새로고침
+        setContent("");
+        setScore(5);
       }
+    } catch (error) {
+      alert("리뷰 등록에 실패했습니다.");
+      console.error(error);
     }
   };
 
-  const handleReviewDelete = (userId: string) => {
-    console.log(movie?.id, ",", userId);
+  const handleReviewDelete = (reviewId: number) => {
+    // 실제 삭제 API 호출 로직 추가 필요
+    console.log("삭제할 리뷰 ID:", reviewId);
   };
 
-  // 좋아요 등록 및 해제
   const handleReviewLike = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    reviewId: number,
     isLike: boolean
   ) => {
-    e.preventDefault();
+    if (!currentUser || !movie) return alert("로그인이 필요합니다.");
 
-    if (!currentUser) {
-      alert("로그인을 먼저 해주세요");
-      return;
-    }
-
-    //e.currentTarget: button 자체의 속성을 안전하게 가져올 때
-    const reviewId = e.currentTarget.dataset.id;
-    const userId = currentUser.userId;
-    const movieId = movie?.id;
-
-    if (!reviewId || !userId || !movieId) return;
-
-    // 만약 좋아요가 되어 있으면 해지
-    if (isLike) {
-      console.log("좋아요 삭제");
-
-      const result = await api_deleteLikes(parseInt(reviewId), userId, movieId);
-      if (result?.status == 200) {
-        const newReviews = reviews.map((review) =>
-          review.id === parseInt(reviewId)
+    const optimisticUpdate = (liked: boolean) => {
+      setReviews(prevReviews =>
+        prevReviews.map(review =>
+          review.id === reviewId
             ? {
-                ...review,
-                isLike: !isLike,
-                likeCount: review.likeCount - 1,
-              }
+              ...review,
+              isLike: liked,
+              likeCount: liked ? review.likeCount + 1 : review.likeCount - 1,
+            }
             : review
-        );
-        setReviews(newReviews);
+        )
+      );
+    };
+
+    optimisticUpdate(!isLike);
+
+    try {
+      if (isLike) {
+        await api_deleteLikes(reviewId, currentUser.userId, movie.id);
+      } else {
+        await api_insertlikes(reviewId, currentUser.userId, movie.id);
       }
-    }
-    // 안되어 있으면 추가
-    else {
-      console.log("좋아요 추가");
-      const result = await api_insertlikes(parseInt(reviewId), userId, movieId);
-      if (result?.status == 200) {
-        const newReviews = reviews.map((review) =>
-          review.id === parseInt(reviewId)
-            ? {
-                ...review,
-                isLike: !isLike,
-                likeCount: review.likeCount + 1,
-              }
-            : review
-        );
-        setReviews(newReviews);
-      }
+    } catch (error) {
+      console.error("좋아요 처리 실패:", error);
+      optimisticUpdate(isLike); // 에러 발생 시 원래대로 되돌림
+      alert("오류가 발생했습니다.");
     }
   };
 
-  if (loading)
-    return <div className="loading-message">정보를 불러오는 중...</div>;
+  if (loading) return <div className="loading-message">정보를 불러오는 중...</div>;
   if (error) return <div className="error-message">{error}</div>;
   if (!movie) return <div>영화 정보가 없습니다.</div>;
 
@@ -191,41 +166,24 @@ const MovieDetail: React.FC = () => {
         />
         <div className="detail-info">
           <h1>{movie.title}</h1>
-          <p>
-            <strong>개봉일:</strong> {movie.release_date}
-          </p>
-
-          <p>
-            <strong>TMDB 평점:</strong> ⭐️ {movie.vote_average.toFixed(1)}
-          </p>
-          <p>
-            <strong>네티즌 평점:</strong> ⭐️{averRank}
-          </p>
+          <p><strong>개봉일:</strong> {movie.release_date}</p>
+          <p><strong>TMDB 평점:</strong> ⭐️ {movie.vote_average.toFixed(1)}</p>
+          <p><strong>네티즌 평점:</strong> ⭐️{averRank.toFixed(2)}</p>
           <h2>줄거리</h2>
-          <p className="overview">
-            {movie.overview || "제공된 줄거리가 없습니다."}
-          </p>
-          <Link to="/" className="back-link">
-            홈으로
-          </Link>
+          <p className="overview">{movie.overview || "제공된 줄거리가 없습니다."}</p>
+          <Link to="/" className="back-link">홈으로</Link>
         </div>
       </div>
 
       <div className="review-section">
         <h2>리뷰</h2>
-
         {currentUser ? (
           <form className="review-form" onSubmit={handleReviewSubmit}>
             <div className="form-row">
-              <strong>
-                작성자: {currentUser.displayName || currentUser.userId}
-              </strong>
+              <strong>작성자: {currentUser.displayName || currentUser.userId}</strong>
             </div>
             <div className="form-row">
-              <select
-                value={score}
-                onChange={(e) => setScore(Number(e.target.value))}
-              >
+              <select value={score} onChange={(e) => setScore(Number(e.target.value))}>
                 <option value="5">⭐️⭐️⭐️⭐️⭐️</option>
                 <option value="4">⭐️⭐️⭐️⭐️</option>
                 <option value="3">⭐️⭐️⭐️</option>
@@ -253,33 +211,22 @@ const MovieDetail: React.FC = () => {
                   <span>{"⭐️".repeat(review.rankScore)}</span>
                 </div>
                 <p>{review.content}</p>
-                {currentUser?.userId === review.userId && (
-                  <>
+                <div className="review-actions">
+                  {currentUser?.userId === review.userId && (
                     <button
-                      onClick={() => handleReviewDelete(review.userId)}
+                      onClick={() => handleReviewDelete(review.id)}
                       className="delete-button"
                     >
-                      <br />
                       삭제
                     </button>
-                  </>
-                )}
-
-                {review.isLike ? (
+                  )}
                   <button
-                    data-id={review.id}
-                    onClick={(e) => handleReviewLike(e, review.isLike)}
+                    className={`like-button ${review.isLike ? 'active' : ''}`}
+                    onClick={() => handleReviewLike(review.id, review.isLike)}
                   >
-                    좋아요(취소) {review.likeCount}
+                    👍 {review.likeCount}
                   </button>
-                ) : (
-                  <button
-                    data-id={review.id}
-                    onClick={(e) => handleReviewLike(e, review.isLike)}
-                  >
-                    좋아요(추가) {review.likeCount}
-                  </button>
-                )}
+                </div>
               </div>
             ))
           ) : (
