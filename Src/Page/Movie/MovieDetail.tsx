@@ -11,6 +11,36 @@ import {
   type IReviews,
 } from "../../Feature/API/Review";
 
+interface StarRatingProps {
+  rating: number;
+  onRatingChange: (rating: number) => void;
+}
+
+const StarRating: React.FC<StarRatingProps> = ({ rating, onRatingChange }) => {
+  const [hoverRating, setHoverRating] = useState(0);
+
+  return (
+    <div className="star-container">
+      {[...Array(5)].map((_, index) => {
+        const starValue = index + 1;
+        const isFilled = starValue <= (hoverRating || rating);
+
+        return (
+          <label
+            key={starValue}
+            className="star-label"
+            onMouseEnter={() => setHoverRating(starValue)}
+            onMouseLeave={() => setHoverRating(0)}
+            onClick={() => onRatingChange(starValue)}
+          >
+            <span className={`star-icon ${isFilled ? "fill" : ""}`}></span>
+          </label>
+        );
+      })}
+    </div>
+  );
+};
+
 interface MovieDetailData {
   id: number;
   title: string;
@@ -102,7 +132,7 @@ const MovieDetail: React.FC = () => {
       const result = await api_insertReview(newReview);
       if (result && result.status === 200) {
         alert("리뷰가 등록되었습니다.");
-        fetchReviewData(); // 리뷰 목록 새로고침
+        fetchReviewData();
         setContent("");
         setScore(5);
       }
@@ -113,7 +143,6 @@ const MovieDetail: React.FC = () => {
   };
 
   const handleReviewDelete = (reviewId: number) => {
-    // 실제 삭제 API 호출 로직 추가 필요
     console.log("삭제할 리뷰 ID:", reviewId);
   };
 
@@ -128,10 +157,10 @@ const MovieDetail: React.FC = () => {
         prevReviews.map(review =>
           review.id === reviewId
             ? {
-              ...review,
-              isLike: liked,
-              likeCount: liked ? review.likeCount + 1 : review.likeCount - 1,
-            }
+                ...review,
+                isLike: liked,
+                likeCount: liked ? review.likeCount + 1 : review.likeCount - 1,
+              }
             : review
         )
       );
@@ -147,7 +176,7 @@ const MovieDetail: React.FC = () => {
       }
     } catch (error) {
       console.error("좋아요 처리 실패:", error);
-      optimisticUpdate(isLike); // 에러 발생 시 원래대로 되돌림
+      optimisticUpdate(isLike);
       alert("오류가 발생했습니다.");
     }
   };
@@ -179,17 +208,13 @@ const MovieDetail: React.FC = () => {
         <h2>리뷰</h2>
         {currentUser ? (
           <form className="review-form" onSubmit={handleReviewSubmit}>
-            <div className="form-row">
-              <strong>작성자: {currentUser.displayName || currentUser.userId}</strong>
+            <div className="form-line">
+              <strong className="form-label">작성자:</strong>
+              <span>{currentUser.displayName || currentUser.userId}</span>
             </div>
-            <div className="form-row">
-              <select value={score} onChange={(e) => setScore(Number(e.target.value))}>
-                <option value="5">⭐️⭐️⭐️⭐️⭐️</option>
-                <option value="4">⭐️⭐️⭐️⭐️</option>
-                <option value="3">⭐️⭐️⭐️</option>
-                <option value="2">⭐️⭐️</option>
-                <option value="1">⭐️</option>
-              </select>
+            <div className="form-line">
+              <strong className="form-label">내 평점:</strong>
+              <StarRating rating={score} onRatingChange={setScore} />
             </div>
             <textarea
               value={content}
