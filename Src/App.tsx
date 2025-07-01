@@ -1,13 +1,14 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { AuthProvider } from "./Context/AuthContext"; 
+import { AuthProvider } from "./Context/AuthContext";
 
 import Header from "./Page/shared_component/Header";
 import Home from "./Page/Home/Home";
 import Login from "./Page/Login/UserLogin";
 import CreateAccount from "./Page/SignUp/CreateAccount";
 import MovieDetail from './Page/Movie/MovieDetail';
-import Search from './Page/Search/Search'; 
+import Search from './Page/Search/Search';
 import NotFound from "./Page/shared_component/NotFound";
+import Community from './Page/Community/Community';
 
 const AppLayout = () => {
   const location = useLocation();
@@ -25,6 +26,7 @@ const AppLayout = () => {
           <Route path="/movie/:movieId" element={<MovieDetail />} />
           <Route path="/search" element={<Search />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="/community" element={<Community />} />
         </Routes>
       </main>
     </>
