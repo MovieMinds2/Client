@@ -9,6 +9,7 @@ import {
   api_insertlikes,
   api_deleteLikes,
   type IReviews,
+  api_deleteReview,
 } from "../../Feature/API/Review";
 
 interface StarRatingProps {
@@ -50,7 +51,7 @@ interface MovieDetailData {
   vote_average: number;
 }
 
-interface NewReview {
+export interface NewReview {
   movieId: number;
   movieTitle: string;
   userId: string;
@@ -149,12 +150,33 @@ const MovieDetail: React.FC = () => {
   ) => {
     e.preventDefault();
 
-    const userId = currentUser?.userId;
-    const reviewId = e.currentTarget.dataset.id;
+    if (confirm("해당 리뷰를 삭제하겠습니까?")) {
+      console.log("리뷰 삭제");
+      const userId = currentUser?.userId;
+      const id = e.currentTarget.dataset.id;
+      const movieId = movie?.id;
 
-    if (!userId || !reviewId) return;
+      console.log(userId, id, movieId);
 
-    // api 호출
+      if (!userId || !id || !movieId) return;
+
+      const reviewId = parseInt(id);
+
+      const deleteReivew = {
+        userId,
+        reviewId,
+        movieId,
+      };
+
+      // api 호출
+      api_deleteReview(deleteReivew).then(() => {
+        setReviews((reviews) =>
+          reviews.filter((review) => review.id !== reviewId)
+        );
+      });
+    } else {
+      alert("취소되었습니다.");
+    }
   };
 
   const handleReviewLike = async (reviewId: number, isLike: boolean) => {
@@ -258,7 +280,8 @@ const MovieDetail: React.FC = () => {
                 <div className="review-actions">
                   {currentUser?.userId === review.userId && (
                     <button
-                      onClick={(e) => handleReviewDelete(e)}
+                      data-id={review.id}
+                      onClick={handleReviewDelete}
                       className="delete-button"
                     >
                       삭제
