@@ -9,6 +9,7 @@ import {
   api_insertlikes,
   api_deleteLikes,
   type IReviews,
+  api_deleteReview,
 } from "../../Feature/API/Review";
 
 interface StarRatingProps {
@@ -50,7 +51,7 @@ interface MovieDetailData {
   vote_average: number;
 }
 
-interface NewReview {
+export interface NewReview {
   movieId: number;
   movieTitle: string;
   userId: string;
@@ -74,7 +75,10 @@ const MovieDetail: React.FC = () => {
 
   const fetchReviewData = useCallback(async () => {
     if (movieId && currentUser) {
-      const results = await api_getReview(parseInt(movieId), currentUser.userId);
+      const results = await api_getReview(
+        parseInt(movieId),
+        currentUser.userId
+      );
       if (results) {
         setReviews(results.reviews);
         setAverRank(parseFloat(results.averRank as any) || 0);
@@ -106,7 +110,6 @@ const MovieDetail: React.FC = () => {
     fetchMovieDetail();
     fetchReviewData();
   }, [movieId, fetchReviewData]);
-
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,19 +145,46 @@ const MovieDetail: React.FC = () => {
     }
   };
 
-  const handleReviewDelete = (reviewId: number) => {
-    console.log("삭제할 리뷰 ID:", reviewId);
+  const handleReviewDelete = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+
+    if (confirm("해당 리뷰를 삭제하겠습니까?")) {
+      console.log("리뷰 삭제");
+      const userId = currentUser?.userId;
+      const id = e.currentTarget.dataset.id;
+      const movieId = movie?.id;
+
+      console.log(userId, id, movieId);
+
+      if (!userId || !id || !movieId) return;
+
+      const reviewId = parseInt(id);
+
+      const deleteReivew = {
+        userId,
+        reviewId,
+        movieId,
+      };
+
+      // api 호출
+      api_deleteReview(deleteReivew).then(() => {
+        setReviews((reviews) =>
+          reviews.filter((review) => review.id !== reviewId)
+        );
+      });
+    } else {
+      alert("취소되었습니다.");
+    }
   };
 
-  const handleReviewLike = async (
-    reviewId: number,
-    isLike: boolean
-  ) => {
+  const handleReviewLike = async (reviewId: number, isLike: boolean) => {
     if (!currentUser || !movie) return alert("로그인이 필요합니다.");
 
     const optimisticUpdate = (liked: boolean) => {
-      setReviews(prevReviews =>
-        prevReviews.map(review =>
+      setReviews((prevReviews) =>
+        prevReviews.map((review) =>
           review.id === reviewId
             ? {
                 ...review,
@@ -181,7 +211,8 @@ const MovieDetail: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="loading-message">정보를 불러오는 중...</div>;
+  if (loading)
+    return <div className="loading-message">정보를 불러오는 중...</div>;
   if (error) return <div className="error-message">{error}</div>;
   if (!movie) return <div>영화 정보가 없습니다.</div>;
 
@@ -195,12 +226,22 @@ const MovieDetail: React.FC = () => {
         />
         <div className="detail-info">
           <h1>{movie.title}</h1>
-          <p><strong>개봉일:</strong> {movie.release_date}</p>
-          <p><strong>TMDB 평점:</strong> ⭐️ {movie.vote_average.toFixed(1)}</p>
-          <p><strong>네티즌 평점:</strong> ⭐️{averRank.toFixed(2)}</p>
+          <p>
+            <strong>개봉일:</strong> {movie.release_date}
+          </p>
+          <p>
+            <strong>TMDB 평점:</strong> ⭐️ {movie.vote_average.toFixed(1)}
+          </p>
+          <p>
+            <strong>네티즌 평점:</strong> ⭐️{averRank.toFixed(2)}
+          </p>
           <h2>줄거리</h2>
-          <p className="overview">{movie.overview || "제공된 줄거리가 없습니다."}</p>
-          <Link to="/" className="back-link">홈으로</Link>
+          <p className="overview">
+            {movie.overview || "제공된 줄거리가 없습니다."}
+          </p>
+          <Link to="/" className="back-link">
+            홈으로
+          </Link>
         </div>
       </div>
 
@@ -239,14 +280,15 @@ const MovieDetail: React.FC = () => {
                 <div className="review-actions">
                   {currentUser?.userId === review.userId && (
                     <button
-                      onClick={() => handleReviewDelete(review.id)}
+                      data-id={review.id}
+                      onClick={handleReviewDelete}
                       className="delete-button"
                     >
                       삭제
                     </button>
                   )}
                   <button
-                    className={`like-button ${review.isLike ? 'active' : ''}`}
+                    className={`like-button ${review.isLike ? "active" : ""}`}
                     onClick={() => handleReviewLike(review.id, review.isLike)}
                   >
                     👍 {review.likeCount}
