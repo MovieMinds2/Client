@@ -1,5 +1,6 @@
 import axios from "axios";
-import type { IReview } from "../../Page/Movie/MovieDetail";
+import type { NewReview } from "../../Page/Movie/MovieDetail";
+import type { SortOrder } from "../../Page/Community/Community";
 
 export interface IReviews {
   id: number;
@@ -17,7 +18,38 @@ export interface IReviewsResult {
   reviews: IReviews[];
 }
 
-export const api_insertReview = async (newReview: IReview) => {
+interface Props {
+  userId: string;
+  reviewId: number;
+  movieId: number;
+}
+
+export const api_deleteReview = async (deleteReview: Props) => {
+  try {
+    console.log(deleteReview);
+
+    const result = await axios.post(
+      `http://${import.meta.env.VITE_SERVER_IP}/reviews/review`,
+      {
+        _method: "DELETE",
+        ...deleteReview,
+      },
+      {
+        // 쿠키값 전송 여부
+        withCredentials: true,
+      }
+    );
+
+    if (result) {
+      console.log(result);
+      return result;
+    }
+  } catch (error) {
+    if (error instanceof Error) throw new Error(error.message);
+  }
+};
+
+export const api_insertReview = async (newReview: NewReview) => {
   try {
     console.log(newReview);
     const result = await axios.post(
@@ -114,6 +146,37 @@ export const api_deleteLikes = async (
     );
     if (result) {
       return result;
+    }
+  } catch (error) {
+    if (error instanceof Error) throw new Error(error.message);
+  }
+};
+
+// 모든 리뷰
+export const api_reviewsAll = async (
+  sort: SortOrder,
+  currentPage: number,
+  limit: number,
+  userId: string
+) => {
+  try {
+    console.log(sort, currentPage, limit);
+
+    const result = await axios.post(
+      `http://${
+        import.meta.env.VITE_SERVER_IP
+      }/reviews?sort=${sort}&currentPage=${currentPage}&limit=${limit}`,
+      {
+        _method: "GET",
+        userId: userId,
+      },
+      {
+        // 쿠키값 전송 여부
+        withCredentials: true,
+      }
+    );
+    if (result) {
+      return result.data;
     }
   } catch (error) {
     if (error instanceof Error) throw new Error(error.message);
