@@ -1,0 +1,168 @@
+.community-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.community-container h1 {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sort-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.sort-tabs button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sort-tabs button:hover {
+    background-color: #f0f0f0;
+}
+
+.sort-tabs button.active {
+    background-color: #20232a;
+    color: white;
+    border-color: #20232a;
+    font-weight: bold;
+}
+
+.review-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.feed-item {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.poster-link img {
+    width: 120px;
+    border-radius: 8px;
+    transition: transform 0.2s;
+}
+
+.poster-link img:hover {
+    transform: scale(1.05);
+}
+
+.feed-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.feed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.movie-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: #000;
+}
+
+.movie-title:hover {
+    text-decoration: underline;
+}
+
+.feed-content h3 {
+    margin: 0 0 10px 0;
+}
+
+.review-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 10px 0 15px 0;
+    flex-grow: 1;
+    font-style: italic;
+    color: #333;
+}
+
+.review-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 0.9rem;
+    color: #777;
+    margin-top: auto;
+}
+
+.author {
+    font-weight: bold;
+}
+
+.like-button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #f0f2f5;
+    border: 1px solid #ccd0d5;
+    border-radius: 12px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.like-button:hover {
+    background-color: #e4e6e9;
+}
+
+.like-button.active {
+    background-color: #e7f3ff;
+    color: #1877f2;
+    border-color: #a0c3f0;
+    font-weight: bold;
+}
+
+.status-message {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 1.2rem;
+    color: #888;
+}
+
+.load-more-container {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.load-more-button {
+    padding: 12px 40px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border: 2px solid #333;
+    background-color: white;
+    color: #333;
+    border-radius: 30px;
+    transition: all 0.3s;
+}
+
+.load-more-button:hover {
+    background-color: #333;
+    color: white;
+}

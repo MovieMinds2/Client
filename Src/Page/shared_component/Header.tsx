@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../../../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -6,15 +6,36 @@ import axios from "axios";
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const user = auth.currentUser;
+  const [user, setUser] = useState(auth.currentUser);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const getCleanDisplayName = (user: typeof auth.currentUser): string => {
+    if (!user) return '사용자';
+
+    const displayName = user.displayName?.split('(')[0].trim();
+    return displayName || user.email || '사용자';
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsLoggedIn(!!user);
+      setUser(user);
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   const handleLogout = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -38,9 +59,12 @@ const Header: React.FC = () => {
     }
   };
 
+  const toggleDropdown = () => {
+    setIsDropdownOpen(prev => !prev);
+  };
+
   return (
     <header style={headerStyle}>
-      {/* --- 1. Left Section: Logo + Search --- */}
       <div style={leftSectionStyle}>
         <Link to="/" style={logoLinkStyle}>
           <span>MovieMinds</span>
@@ -50,7 +74,6 @@ const Header: React.FC = () => {
         </Link>
       </div>
 
-      {/* --- 2. Center Section: Home + Community --- */}
       <nav style={centerNavStyle}>
         <Link to="/" style={navLinkStyle}>
           홈
@@ -60,31 +83,25 @@ const Header: React.FC = () => {
         </Link>
       </nav>
 
-      {/* --- 3. Right Section: User Menu --- */}
       <div style={rightSectionStyle}>
-        {isLoggedIn ? (
-          <>
-            {/* Display an empty string if displayName is null or undefined to prevent errors */}
-            <span>{user?.displayName || user?.email || "사용자"}님</span>
-            <Link to="/mypage" style={navLinkStyle}>
-              마이페이지
-            </Link>
-            <button onClick={handleLogout} style={navButtonStyle}>
-              로그아웃
+        {user ? (
+          <div style={profileMenuStyle} ref={dropdownRef}>
+            <button onClick={toggleDropdown} style={profileButtonStyle}>
+              {user.photoURL && (
+                <img src={user.photoURL} alt="profile" style={profileImgStyle} />
+              )}
+              <span>{getCleanDisplayName(user)}님</span>
             </button>
-            {user?.photoURL ? (
-              <img src={`${user?.photoURL}`} width={50} height={50} />
-            ) : null}
-            {user?.displayName ? <span> {user.displayName} </span> : null}
-          </>
+
+            <div style={{ ...dropdownMenuStyle, ...(isDropdownOpen ? dropdownMenuOpenStyle : {}) }}>
+              <Link to="/mypage" style={dropdownLinkStyle} onClick={() => setIsDropdownOpen(false)}>마이페이지</Link>
+              <button onClick={handleLogout} style={dropdownButtonStyle}>로그아웃</button>
+            </div>
+          </div>
         ) : (
           <>
-            <Link to="/login" style={navLinkStyle}>
-              로그인
-            </Link>
-            <Link to="/create-account" style={navLinkStyle}>
-              회원가입
-            </Link>
+            <Link to="/login" style={navLinkStyle}>로그인</Link>
+            <Link to="/create-account" style={navLinkStyle}>회원가입</Link>
           </>
         )}
       </div>
@@ -137,14 +154,71 @@ const navLinkStyle: React.CSSProperties = {
   transition: "background-color 0.2s ease, color 0.2s ease",
 };
 
-const navButtonStyle: React.CSSProperties = {
-  backgroundColor: "#61dafb",
-  color: "#20232a",
-  border: "none",
-  padding: "8px 15px",
-  borderRadius: "5px",
-  cursor: "pointer",
-  fontSize: "1.1rem",
-  fontWeight: "bold",
-  transition: "background-color 0.2s ease",
+const profileMenuStyle: React.CSSProperties = {
+  position: 'relative',
+};
+
+const profileButtonStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+  backgroundColor: 'transparent',
+  border: 'none',
+  color: 'white',
+  cursor: 'pointer',
+  padding: '5px',
+  borderRadius: '5px',
+  fontSize: '1rem',
+};
+
+const profileImgStyle: React.CSSProperties = {
+  width: '40px',
+  height: '40px',
+  borderRadius: '50%', // 프로필 이미지 원형
+};
+
+const dropdownMenuStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: '120%',
+  left: '50%',
+  backgroundColor: '#333',
+  borderRadius: '8px',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+  display: 'flex',
+  flexDirection: 'column',
+  width: '150px',
+  zIndex: 100,
+  // 애니메이션 효과
+  transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out',
+  opacity: 0,
+  transform: 'translate(-50%, -10px)',
+  visibility: 'hidden',
+};
+
+const dropdownMenuOpenStyle: React.CSSProperties = {
+  opacity: 1,
+  transform: 'translate(-50%, 0)',
+  visibility: 'visible',
+};
+
+const dropdownLinkStyle: React.CSSProperties = {
+  textDecoration: 'none',
+  color: 'white',
+  padding: '12px 20px',
+  transition: 'background-color 0.2s',
+  textAlign: 'left',
+  width: '100%',
+  boxSizing: 'border-box',
+};
+
+const dropdownButtonStyle: React.CSSProperties = {
+  backgroundColor: 'transparent',
+  border: 'none',
+  borderTop: '1px solid #555',
+  color: 'white',
+  padding: '12px 20px',
+  cursor: 'pointer',
+  fontSize: '1rem',
+  textAlign: 'left',
+  width: '100%',
 };
