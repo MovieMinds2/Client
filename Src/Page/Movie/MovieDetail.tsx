@@ -116,8 +116,17 @@ const MovieDetail: React.FC = () => {
     }
   };
 
-  const handleReviewDelete = (userId: string) => {
-    console.log(movie?.id, ",", userId);
+  const handleReviewDelete = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+
+    const userId = currentUser?.userId;
+    const reviewId = e.currentTarget.dataset.id;
+
+    if (!userId || !reviewId) return;
+
+    // api 호출
   };
 
   // 좋아요 등록 및 해제
@@ -256,7 +265,8 @@ const MovieDetail: React.FC = () => {
                 {currentUser?.userId === review.userId && (
                   <>
                     <button
-                      onClick={() => handleReviewDelete(review.userId)}
+                      data-id={review.id}
+                      onClick={(e) => handleReviewDelete(e)}
                       className="delete-button"
                     >
                       <br />
