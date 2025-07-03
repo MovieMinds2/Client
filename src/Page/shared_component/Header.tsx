@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../../../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import axios from "axios";
+import { api_logout } from "../../Feature/API/User";
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -11,10 +12,10 @@ const Header: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const getCleanDisplayName = (user: typeof auth.currentUser): string => {
-    if (!user) return '사용자';
+    if (!user) return "사용자";
 
-    const displayName = user.displayName?.split('(')[0].trim();
-    return displayName || user.email || '사용자';
+    const displayName = user.displayName?.split("(")[0].trim();
+    return displayName || user.email || "사용자";
   };
 
   useEffect(() => {
@@ -26,7 +27,10 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
@@ -43,16 +47,11 @@ const Header: React.FC = () => {
     event.preventDefault();
     if (window.confirm("로그아웃 하시겠습니까?")) {
       try {
-        await axios.post(
-          `http://${import.meta.env.VITE_SERVER_IP}/users/logout`,
-          null,
-          {
-            withCredentials: true,
-          }
-        );
-        await signOut(auth);
-        alert("로그아웃 되었습니다.");
-        navigate("/");
+        api_logout().then(async () => {
+          await signOut(auth);
+          alert("로그아웃 되었습니다.");
+          navigate("/");
+        });
       } catch (error) {
         console.error("Failed to request logout:", error);
       }
@@ -60,7 +59,7 @@ const Header: React.FC = () => {
   };
 
   const toggleDropdown = () => {
-    setIsDropdownOpen(prev => !prev);
+    setIsDropdownOpen((prev) => !prev);
   };
 
   return (
@@ -88,20 +87,41 @@ const Header: React.FC = () => {
           <div style={profileMenuStyle} ref={dropdownRef}>
             <button onClick={toggleDropdown} style={profileButtonStyle}>
               {user.photoURL && (
-                <img src={user.photoURL} alt="profile" style={profileImgStyle} />
+                <img
+                  src={user.photoURL}
+                  alt="profile"
+                  style={profileImgStyle}
+                />
               )}
               <span>{getCleanDisplayName(user)}님</span>
             </button>
 
-            <div style={{ ...dropdownMenuStyle, ...(isDropdownOpen ? dropdownMenuOpenStyle : {}) }}>
-              <Link to="/mypage" style={dropdownLinkStyle} onClick={() => setIsDropdownOpen(false)}>마이페이지</Link>
-              <button onClick={handleLogout} style={dropdownButtonStyle}>로그아웃</button>
+            <div
+              style={{
+                ...dropdownMenuStyle,
+                ...(isDropdownOpen ? dropdownMenuOpenStyle : {}),
+              }}
+            >
+              <Link
+                to="/mypage"
+                style={dropdownLinkStyle}
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                마이페이지
+              </Link>
+              <button onClick={handleLogout} style={dropdownButtonStyle}>
+                로그아웃
+              </button>
             </div>
           </div>
         ) : (
           <>
-            <Link to="/login" style={navLinkStyle}>로그인</Link>
-            <Link to="/create-account" style={navLinkStyle}>회원가입</Link>
+            <Link to="/login" style={navLinkStyle}>
+              로그인
+            </Link>
+            <Link to="/create-account" style={navLinkStyle}>
+              회원가입
+            </Link>
           </>
         )}
       </div>
@@ -155,70 +175,70 @@ const navLinkStyle: React.CSSProperties = {
 };
 
 const profileMenuStyle: React.CSSProperties = {
-  position: 'relative',
+  position: "relative",
 };
 
 const profileButtonStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '10px',
-  backgroundColor: 'transparent',
-  border: 'none',
-  color: 'white',
-  cursor: 'pointer',
-  padding: '5px',
-  borderRadius: '5px',
-  fontSize: '1rem',
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  backgroundColor: "transparent",
+  border: "none",
+  color: "white",
+  cursor: "pointer",
+  padding: "5px",
+  borderRadius: "5px",
+  fontSize: "1rem",
 };
 
 const profileImgStyle: React.CSSProperties = {
-  width: '40px',
-  height: '40px',
-  borderRadius: '50%', // 프로필 이미지 원형
+  width: "40px",
+  height: "40px",
+  borderRadius: "50%", // 프로필 이미지 원형
 };
 
 const dropdownMenuStyle: React.CSSProperties = {
-  position: 'absolute',
-  top: '120%',
-  left: '50%',
-  backgroundColor: '#333',
-  borderRadius: '8px',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-  display: 'flex',
-  flexDirection: 'column',
-  width: '150px',
+  position: "absolute",
+  top: "120%",
+  left: "50%",
+  backgroundColor: "#333",
+  borderRadius: "8px",
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+  display: "flex",
+  flexDirection: "column",
+  width: "150px",
   zIndex: 100,
   // 애니메이션 효과
-  transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out',
+  transition: "opacity 0.2s ease-in-out, transform 0.2s ease-in-out",
   opacity: 0,
-  transform: 'translate(-50%, -10px)',
-  visibility: 'hidden',
+  transform: "translate(-50%, -10px)",
+  visibility: "hidden",
 };
 
 const dropdownMenuOpenStyle: React.CSSProperties = {
   opacity: 1,
-  transform: 'translate(-50%, 0)',
-  visibility: 'visible',
+  transform: "translate(-50%, 0)",
+  visibility: "visible",
 };
 
 const dropdownLinkStyle: React.CSSProperties = {
-  textDecoration: 'none',
-  color: 'white',
-  padding: '12px 20px',
-  transition: 'background-color 0.2s',
-  textAlign: 'left',
-  width: '100%',
-  boxSizing: 'border-box',
+  textDecoration: "none",
+  color: "white",
+  padding: "12px 20px",
+  transition: "background-color 0.2s",
+  textAlign: "left",
+  width: "100%",
+  boxSizing: "border-box",
 };
 
 const dropdownButtonStyle: React.CSSProperties = {
-  backgroundColor: 'transparent',
-  border: 'none',
-  borderTop: '1px solid #555',
-  color: 'white',
-  padding: '12px 20px',
-  cursor: 'pointer',
-  fontSize: '1rem',
-  textAlign: 'left',
-  width: '100%',
+  backgroundColor: "transparent",
+  border: "none",
+  borderTop: "1px solid #555",
+  color: "white",
+  padding: "12px 20px",
+  cursor: "pointer",
+  fontSize: "1rem",
+  textAlign: "left",
+  width: "100%",
 };
