@@ -26,7 +26,7 @@ const Community: React.FC = () => {
   const [reviews, setReviews] = useState<ReviewFeedItem[]>([]);
   const [sortOrder, setSortOrder] = useState<SortOrder>("latest");
   const [page, setPage] = useState(1);
-  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasNextPage, _setHasNextPage] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const fetchReviews = useCallback(async (sort: SortOrder, pageNum: number) => {
