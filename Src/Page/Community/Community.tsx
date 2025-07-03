@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { useAuth } from '../../Context/AuthContext';
-import './Community.css';
-import { api_reviewsAll } from '../../Feature/API/Review';
-import { LIMIT } from '../../Constants/review';
+import React, { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../../Context/AuthContext";
+import "./Community.css";
+import { api_reviewsAll } from "../../Feature/API/Review";
+import { LIMIT } from "../../Constants/review";
 
 interface ReviewFeedItem {
   id: number;
@@ -19,12 +19,12 @@ interface ReviewFeedItem {
   nickname: string;
 }
 
-export type SortOrder = 'latest' | 'oldest' | 'likes_desc';
+export type SortOrder = "latest" | "oldest" | "likes_desc";
 
 const Community: React.FC = () => {
   const { currentUser } = useAuth();
   const [reviews, setReviews] = useState<ReviewFeedItem[]>([]);
-  const [sortOrder, setSortOrder] = useState<SortOrder>('latest');
+  const [sortOrder, setSortOrder] = useState<SortOrder>("latest");
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -100,7 +100,7 @@ const Community: React.FC = () => {
         await axios.post(url, {}, { withCredentials: true });
       }
     } catch (error) {
-      alert("오류가 발생했습니다. 다시 시도해주세요.");
+      alert(`오류가 발생했습니다. 다시 시도해주세요. (${error})`);
       setReviews(reviews.map((r) => (r.id === reviewId ? targetReview : r)));
     }
   };
