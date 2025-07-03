@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../../../firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import axios from "axios";
 import { api_logout } from "../../Feature/API/User";
 
 const Header: React.FC = () => {
