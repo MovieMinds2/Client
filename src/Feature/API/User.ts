@@ -41,3 +41,9 @@ export const api_login = async (userId: string): Promise<any> => {
     if (error instanceof Error) throw new Error(error.message);
   }
 };
+
+export const api_logout = async () => {
+  await axios.post(`${import.meta.env.VITE_SERVER_IP}/users/logout`, null, {
+    withCredentials: true,
+  });
+};
