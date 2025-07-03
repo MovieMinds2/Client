@@ -29,7 +29,7 @@ export const api_deleteReview = async (deleteReview: Props) => {
     console.log(deleteReview);
 
     const result = await axios.post(
-      `http://${import.meta.env.VITE_SERVER_IP}/reviews/review`,
+      `${import.meta.env.VITE_SERVER_IP}/reviews/review`,
       {
         _method: "DELETE",
         ...deleteReview,
@@ -53,7 +53,7 @@ export const api_insertReview = async (newReview: NewReview) => {
   try {
     console.log(newReview);
     const result = await axios.post(
-      `http://${import.meta.env.VITE_SERVER_IP}/reviews`,
+      `${import.meta.env.VITE_SERVER_IP}/reviews`,
       {
         newReview: newReview,
       },
@@ -78,7 +78,7 @@ export const api_getReview = async (
 ): Promise<IReviewsResult | undefined> => {
   try {
     const result = await axios.post(
-      `http://${import.meta.env.VITE_SERVER_IP}/reviews/review`,
+      `${import.meta.env.VITE_SERVER_IP}/reviews/review`,
       {
         movieId: movieId,
         userId: userId,
@@ -105,7 +105,7 @@ export const api_insertlikes = async (
 ) => {
   try {
     const result = await axios.post(
-      `http://${import.meta.env.VITE_SERVER_IP}/reviews/likes`,
+      `${import.meta.env.VITE_SERVER_IP}/reviews/likes`,
       {
         movieId: movieId,
         reviewId: reviewId,
@@ -132,7 +132,7 @@ export const api_deleteLikes = async (
 ) => {
   try {
     const result = await axios.post(
-      `http://${import.meta.env.VITE_SERVER_IP}/reviews/likes`,
+      `${import.meta.env.VITE_SERVER_IP}/reviews/likes`,
       {
         _method: "DELETE",
         movieId: movieId,
@@ -163,7 +163,7 @@ export const api_reviewsAll = async (
     console.log(sort, currentPage, limit);
 
     const result = await axios.post(
-      `http://${
+      `${
         import.meta.env.VITE_SERVER_IP
       }/reviews?sort=${sort}&currentPage=${currentPage}&limit=${limit}`,
       {

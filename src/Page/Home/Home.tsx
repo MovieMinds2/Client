@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Slider from "react-slick";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -117,7 +117,11 @@ const Home: React.FC = () => {
         <h2>상영중인 인기 영화</h2>
         <Slider {...moviesliderSettings}>
           {movies.map((movie) => (
-            <Link to={`/movie/${movie.id}`} key={movie.id} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Link
+              to={`/movie/${movie.id}`}
+              key={movie.id}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
               <div className="movie-card-slide">
                 <img
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
