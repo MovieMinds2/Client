@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../Context/AuthContext";
 import "./MovieDetail.css";
@@ -140,7 +140,13 @@ const MovieDetail: React.FC = () => {
         setScore(5);
       }
     } catch (error) {
-      alert("리뷰 등록에 실패했습니다.");
+      if (axios.isAxiosError(error)) {
+        if (!error.response) return;
+
+        if (error.response.status == 401)
+          alert("인증 만료: 로그인 해주세요(로그아웃 후 로그인 페이지 이동)");
+      }
+
       console.error(error);
     }
   };

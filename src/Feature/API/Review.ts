@@ -64,11 +64,13 @@ export const api_insertReview = async (newReview: NewReview) => {
     );
 
     if (result) {
-      console.log(result);
+      console.log(result.status);
       return result;
     }
-  } catch (error) {
-    if (error instanceof Error) throw new Error(error.message);
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw error;
+    }
   }
 };
 
