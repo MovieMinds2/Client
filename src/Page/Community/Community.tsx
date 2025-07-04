@@ -3,7 +3,11 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../Context/AuthContext";
 import "./Community.css";
-import { api_reviewsAll } from "../../Feature/API/Review";
+import {
+  api_deleteLikes,
+  api_insertlikes,
+  api_reviewsAll,
+} from "../../Feature/API/Review";
 import { LIMIT } from "../../Constants/review";
 
 interface ReviewFeedItem {
@@ -68,11 +72,12 @@ const Community: React.FC = () => {
     fetchReviews(sortOrder, nextPage);
   };
 
-  const handleLikeToggle = async (reviewId: number) => {
+  const handleLikeToggle = async (reviewId: number, movieId: number) => {
     if (!currentUser) {
       alert("로그인이 필요합니다.");
       return;
     }
+    const userId = currentUser.userId;
 
     const targetReview = reviews.find((r) => r.id === reviewId);
     if (!targetReview) return;
@@ -91,13 +96,10 @@ const Community: React.FC = () => {
     );
 
     try {
-      const url = `http://${
-        import.meta.env.VITE_SERVER_IP
-      }/reviews/${reviewId}/like`;
       if (isLiked) {
-        await axios.delete(url, { withCredentials: true });
+        await api_insertlikes(reviewId, userId, movieId);
       } else {
-        await axios.post(url, {}, { withCredentials: true });
+        await api_deleteLikes(reviewId, userId, movieId);
       }
     } catch (error) {
       alert(`오류가 발생했습니다. 다시 시도해주세요. (${error})`);
@@ -146,7 +148,7 @@ const Community: React.FC = () => {
                   <h3>{review.movieTitle}</h3>
                 </Link>
                 <button
-                  onClick={() => handleLikeToggle(review.id)}
+                  onClick={() => handleLikeToggle(review.id, review.movieId)}
                   className={`like-button ${review.isLike ? "active" : ""}`}
                 >
                   👍 {review.likeCount}
