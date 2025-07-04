@@ -145,6 +145,12 @@ const MovieDetail: React.FC = () => {
 
         if (error.response.status == 401)
           alert("인증 만료: 로그인 해주세요(로그아웃 후 로그인 페이지 이동)");
+        else if ((error.response.status = 400)) {
+          const message = error.response.data.message;
+          if (message === "Bad_Content") alert("비속어는 사용할 수 없습니다.");
+          else if (message === "Review_Duplication")
+            alert("각 영화당 2개 이상의 리뷰를 작성할 수 없습니다.");
+        }
       }
 
       console.error(error);
