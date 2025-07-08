@@ -74,7 +74,7 @@ const MovieDetail: React.FC = () => {
   const [content, setContent] = useState("");
 
   const fetchReviewData = useCallback(async () => {
-    if (movieId && currentUser) {
+    if (movieId && currentUser?.userId) {
       const results = await api_getReview(
         parseInt(movieId),
         currentUser.userId
