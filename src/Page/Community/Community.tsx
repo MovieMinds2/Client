@@ -82,22 +82,33 @@ const Community: React.FC = () => {
     if (!targetReview) return;
 
     const isLiked = targetReview.isLike;
+    console.log("isLiked:", isLiked);
+
     const newLikeCount = isLiked
       ? targetReview.likeCount - 1
       : targetReview.likeCount + 1;
 
+    console.log("newLikeCount:", newLikeCount);
+
     setReviews(
-      reviews.map((r) =>
-        r.id === reviewId
-          ? { ...r, isLikedByCurrentUser: !isLiked, likeCount: newLikeCount }
-          : r
+      reviews.map((review) =>
+        review.id === reviewId
+          ? {
+              ...review,
+              isLike: !isLiked,
+              likeCount: newLikeCount,
+            }
+          : review
       )
     );
 
     try {
-      if (isLiked) {
+      if (!isLiked) {
+        console.log("좋아요 추가");
+
         await api_insertlikes(reviewId, userId, movieId);
       } else {
+        console.log("좋아요 취소");
         await api_deleteLikes(reviewId, userId, movieId);
       }
     } catch (error) {

@@ -1,5 +1,4 @@
 import axios from "axios";
-const API_BASE_URL = `http://${import.meta.env.VITE_SERVER_IP}`;
 import type { NewReview } from "../../Page/Movie/MovieDetail";
 import type { SortOrder } from "../../Page/Community/Community";
 
@@ -20,7 +19,6 @@ export interface IReviewsResult {
 }
 
 interface Props {
-  userId: string;
   reviewId: number;
   movieId: number;
 }
@@ -188,9 +186,12 @@ export const api_reviewsAll = async (
 
 export const api_getMyReviews = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/myReviews`, {
-      withCredentials: true,
-    });
+    const response = await axios.get(
+      `${import.meta.env.VITE_SERVER_IP}/mypage/myreview`,
+      {
+        withCredentials: true,
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("내가 쓴 리뷰 조회 실패:", error);
@@ -201,8 +202,8 @@ export const api_getMyReviews = async () => {
 export const api_updateReview = async (reviewId: number, content: string) => {
   try {
     const response = await axios.put(
-      `${API_BASE_URL}/myReviews/${reviewId}`,
-      { content },
+      `${import.meta.env.VITE_SERVER_IP}/mypage/myreview`,
+      { reviewId, updatedContent: content },
       { withCredentials: true }
     );
     return response;
