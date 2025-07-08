@@ -83,7 +83,7 @@ const MyPage: React.FC = () => {
           <strong>아이디:</strong> {currentUser?.userId}
         </p>
         <p>
-          <strong>닉네임:</strong> {currentUser?.displayName || "설정 필요"}
+          <strong>닉네임:</strong> {currentUser?.displayName || "Anonymous"}
         </p>
       </div>
 
