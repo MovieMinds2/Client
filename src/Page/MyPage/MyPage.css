@@ -1,0 +1,106 @@
+.mypage-container { 
+  max-width: 900px; 
+  margin: 40px auto; 
+  padding: 20px; 
+}
+.mypage-container h1 { 
+  text-align: center; 
+  margin-bottom: 40px; 
+}
+
+.profile-section { 
+  padding: 20px; 
+  background-color: #f9f9f9; 
+  border-radius: 8px; 
+  margin-bottom: 40px; 
+}
+
+.my-reviews-section h2 { 
+  border-bottom: 2px solid #333; 
+  padding-bottom: 10px; 
+  margin-bottom: 20px; 
+}
+
+.my-reviews-list { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 20px; 
+}
+
+.my-review-item { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  gap: 20px; 
+  padding: 20px; 
+  border: 1px solid #eee; 
+  border-radius: 12px; 
+}
+
+.my-review-details { 
+  flex: 1; 
+}
+
+.my-review-details h3 { 
+  margin: 0 0 10px 0; 
+  font-size: 1.3rem; 
+}
+
+.my-review-details a { 
+  text-decoration: none; 
+  color: inherit; 
+}
+
+.my-review-details a:hover h3 { 
+  text-decoration: underline; 
+}
+
+.my-review-content { 
+  font-style: italic; 
+  color: #555; 
+  margin: 0 0 10px 0; 
+  line-height: 1.6; 
+}
+
+.my-review-date { 
+  font-size: 0.8rem; 
+  color: #999; 
+}
+
+.edit-textarea { 
+  width: 98%; 
+  min-height: 60px; 
+  padding: 10px; 
+  border: 1px solid #ccc; 
+  border-radius: 4px; 
+  font-family: inherit; 
+  font-size: 1rem; 
+}
+
+.my-review-actions { 
+  display: flex; 
+  gap: 10px; 
+}
+
+.action-btn { 
+  padding: 8px 15px; 
+  border: none; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  font-weight: bold; 
+}
+
+.action-btn.delete-btn { 
+  background-color: #f44336; 
+  color: white; 
+}
+
+.action-btn.save-btn { 
+  background-color: #4CAF50; 
+  color: white; 
+}
+
+.action-btn.cancel-btn { 
+  background-color: #777; 
+  color: white; 
+}

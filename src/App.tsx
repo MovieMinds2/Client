@@ -9,6 +9,9 @@ import MovieDetail from './Page/Movie/MovieDetail';
 import Search from './Page/Search/Search';
 import NotFound from "./Page/shared_component/NotFound";
 import Community from './Page/Community/Community';
+import MyPage from './Page/MyPage/Mypage';
+import ProtectedRoute from './ProtectedRoute';
+
 
 const AppLayout = () => {
   const location = useLocation();
@@ -25,8 +28,16 @@ const AppLayout = () => {
           <Route path="/create-account" element={<CreateAccount />} />
           <Route path="/movie/:movieId" element={<MovieDetail />} />
           <Route path="/search" element={<Search />} />
-          <Route path="*" element={<NotFound />} />
           <Route path="/community" element={<Community />} />
+          <Route 
+            path="/mypage" 
+            element={
+              <ProtectedRoute>
+                <MyPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
     </>
