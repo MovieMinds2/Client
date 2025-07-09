@@ -12,19 +12,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-       # ✅ 여기에 추가
-      - name: Generate .env file with clean secrets
+      - name: Generate .env file
         run: |
-          clean() { echo "$1" | sed -e 's/^\"//' -e 's/\"$//' -e "s/^'//" -e "s/'$//"; }
-
-          echo "VITE_FIREBASE_API_KEY=$(clean \"${{ secrets.VITE_FIREBASE_API_KEY }}\")" >> .env
-          echo "VITE_FIREBASE_AUTH_DOMAIN=$(clean \"${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}\")" >> .env
-          echo "VITE_FIREBASE_PROJECT_ID=$(clean \"${{ secrets.VITE_FIREBASE_PROJECT_ID }}\")" >> .env
-          echo "VITE_FIREBASE_STORAGE_BUCKET=$(clean \"${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}\")" >> .env
-          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=$(clean \"${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}\")" >> .env
-          echo "VITE_FIREBASE_APP_ID=$(clean \"${{ secrets.VITE_FIREBASE_APP_ID }}\")" >> .env
-          echo "VITE_TMDB_API_KEY=$(clean \"${{ secrets.VITE_TMDB_API_KEY }}\")" >> .env
-          echo "VITE_SERVER_IP=$(clean \"${{ secrets.VITE_SERVER_IP }}\")" >> .env
+          echo "VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}" >> .env
+          echo "VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}" >> .env
+          echo "VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }}" >> .env
+          echo "VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}" >> .env
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}" >> .env
+          echo "VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}" >> .env
+          echo "VITE_TMDB_API_KEY=${{ secrets.VITE_TMDB_API_KEY }}" >> .env
+          echo "VITE_SERVER_IP=${{ secrets.VITE_SERVER_IP }}" >> .env
           
       - run: npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
