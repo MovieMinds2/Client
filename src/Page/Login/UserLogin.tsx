@@ -7,6 +7,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   updateProfile,
+  signOut,
 } from "firebase/auth";
 import { v4 as uuidv4 } from "uuid";
 import { api_login } from "../../Feature/API/User";
@@ -41,6 +42,8 @@ const Login: React.FC = () => {
         alert("이메일 또는 비밀번호가 유효하지 않습니다.");
       } else {
         alert("로그인 중 오류가 발생했습니다.");
+        await signOut(auth);
+        navigate("/");
       }
     }
   };
@@ -65,7 +68,9 @@ const Login: React.FC = () => {
         navigate("/");
       }
     } catch (error) {
-      console.error("소셜 로그인 중 에러 발생:", error);
+      alert("로그인 중 오류가 발생했습니다.");
+      await signOut(auth);
+      navigate("/");
     }
   };
 

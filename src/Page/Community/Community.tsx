@@ -37,7 +37,7 @@ const Community: React.FC = () => {
 
     const userId = currentUser?.userId;
 
-    if (!userId) return;
+    // if (!userId) return;
 
     try {
       const response = await api_reviewsAll(sort, pageNum, LIMIT, userId);
@@ -46,11 +46,6 @@ const Community: React.FC = () => {
         const newReviews: ReviewFeedItem[] = response.reviews;
 
         setReviews(newReviews);
-
-        // setReviews((prev) =>
-        //   pageNum === 1 ? newReviews : [...prev, ...newReviews]
-        // );
-        // setHasNextPage(response.data.hasNextPage);
       }
     } catch (err) {
       console.error("리뷰를 불러오는 데 실패했습니다.", err);

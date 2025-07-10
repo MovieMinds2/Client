@@ -73,12 +73,24 @@ const MovieDetail: React.FC = () => {
   const [score, setScore] = useState(5);
   const [content, setContent] = useState("");
 
+  // const fetchReviewData = useCallback(async () => {
+  //   if (movieId && currentUser?.userId) {
+  //     const results = await api_getReview(
+  //       parseInt(movieId),
+  //       currentUser.userId
+  //     );
+  //     if (results) {
+  //       setReviews(results.reviews);
+  //       setAverRank(parseFloat(results.averRank as any) || 0);
+  //     }
+  //   }
+  // }, [movieId, currentUser]);
+
   const fetchReviewData = useCallback(async () => {
-    if (movieId && currentUser?.userId) {
-      const results = await api_getReview(
-        parseInt(movieId),
-        currentUser.userId
-      );
+    const userId = currentUser?.userId;
+
+    if (movieId) {
+      const results = await api_getReview(parseInt(movieId), userId);
       if (results) {
         setReviews(results.reviews);
         setAverRank(parseFloat(results.averRank as any) || 0);
