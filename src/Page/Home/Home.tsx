@@ -15,9 +15,9 @@ interface Movie {
 }
 
 const bannerImages = [
-  "https://image.tmdb.org/t/p/original/srYya1ZlI97Au4jUYAktDe3avyA.jpg",
-  "https://image.tmdb.org/t/p/original/2KGxwL6f1l_tJgssM4C15a4pGdn.jpg",
-  "https://image.tmdb.org/t/p/original/jsoz1HjbA4PKmWogM9jrzSgqY0h.jpg",
+  "/image/banner1.jpg",
+  "/image/banner2.jpg",
+  "/image/banner3.jpg",
 ];
 
 const Home: React.FC = () => {
