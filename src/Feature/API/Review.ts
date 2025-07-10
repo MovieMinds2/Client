@@ -75,7 +75,7 @@ export const api_insertReview = async (newReview: NewReview) => {
 
 export const api_getReview = async (
   movieId: number,
-  userId: string
+  userId: string | undefined
 ): Promise<IReviewsResult | undefined> => {
   try {
     const result = await axios.post(
@@ -158,7 +158,7 @@ export const api_reviewsAll = async (
   sort: SortOrder,
   currentPage: number,
   limit: number,
-  userId: string
+  userId: string | undefined
 ) => {
   try {
     console.log(sort, currentPage, limit);
