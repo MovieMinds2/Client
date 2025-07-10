@@ -15,9 +15,9 @@ interface Movie {
 }
 
 const bannerImages = [
-  "./image/banner1.jpg",
-  "./image/banner2.jpg",
-  "./image/banner3.jpg",
+  "Public/image/banner1.jpg",
+  "Public/image/banner2.jpg",
+  "Public/image/banner3.jpg",
 ];
 
 const Home: React.FC = () => {
